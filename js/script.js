@@ -190,33 +190,4 @@ $(document).ready(function(){
         }, 3000);
     }
 
-    isClicked = false;
-
-    $(".offer_link").click(function(e){
-        e.preventDefault();
-
-        if (isClicked) return;
-        isClicked = true;
-
-        fbq('track', 'PageView');
-
-        setTimeout(() => {
-            window.location.href = $(this).attr("href");
-        }, 500);
-
-        setTimeout(() => {
-            isClicked = false;
-        }, 5000);
-    });
-
-
-// test
-// $(".hero").fadeOut(0)
-// $(".timer").fadeOut(0)
-// $(".contact").fadeOut(0)
-// $(".final").fadeIn(0)
-// $("body").addClass("quiz-active")
-// runConfetti()
-
-
 })
