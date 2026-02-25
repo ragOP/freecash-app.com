@@ -1,60 +1,96 @@
-(function ($) {
+(function () {
     'use strict';
 
     var currentStep = 1;
     var totalSteps = 3;
 
     function showSurvey() {
-        $('.hero').hide();
-        $('.reviews').hide();
-        $('.survey').css('display', 'block');
+        var timer = document.querySelector('.timer');
+        var hero = document.querySelector('.hero');
+        var reviews = document.querySelector('.reviews');
+        var contact = document.querySelector('.contact');
+        var survey = document.querySelector('.survey');
+        if (timer) timer.style.display = 'none';
+        if (hero) hero.style.display = 'none';
+        if (reviews) reviews.style.display = 'none';
+        if (contact) contact.style.display = 'none';
+        if (survey) survey.style.display = 'block';
+
         currentStep = 1;
-        $('.question').hide();
-        $('.question-1').show();
-        $('.current-step').text(1);
-        $('.progress-percentage').text('0%');
-        $('.progress-line').css('width', '0%');
+        var questions = document.querySelectorAll('.survey .question');
+        questions.forEach(function (q) {
+            q.style.display = q.classList.contains('question-1') ? 'block' : 'none';
+        });
+
+        var stepEl = document.querySelector('.current-step');
+        var pctEl = document.querySelector('.progress-percentage');
+        var lineEl = document.querySelector('.progress-line');
+        if (stepEl) stepEl.textContent = '1';
+        if (pctEl) pctEl.textContent = '0%';
+        if (lineEl) lineEl.style.width = '0%';
     }
 
     function updateProgress(step) {
         var pct = Math.round((step / totalSteps) * 100);
-        $('.current-step').text(step);
-        $('.progress-percentage').text(pct + '%');
-        $('.progress-line').css('width', pct + '%');
+        var stepEl = document.querySelector('.current-step');
+        var pctEl = document.querySelector('.progress-percentage');
+        var lineEl = document.querySelector('.progress-line');
+        if (stepEl) stepEl.textContent = step;
+        if (pctEl) pctEl.textContent = pct + '%';
+        if (lineEl) lineEl.style.width = pct + '%';
     }
 
     function goToStep(step) {
-        $('.question').hide();
-        $('.question-' + step).show();
-        updateProgress(step);
+        var questions = document.querySelectorAll('.survey .question');
+        questions.forEach(function (q) {
+            q.style.display = q.classList.contains('question-' + step) ? 'block' : 'none';
+        });
+        updateProgress(step <= 3 ? step : 3);
     }
 
     function showFinal() {
-        $('.survey').hide();
-        $('.final').show();
+        var timer = document.querySelector('.timer');
+        var survey = document.querySelector('.survey');
+        var final = document.querySelector('.final');
+        if (survey) survey.style.display = 'none';
+        if (final) final.style.display = 'block';
+        if (timer) timer.style.display = 'block';
     }
 
-    // Get Started (hero only): show quiz and hide hero
-    $(document).on('click', '.landing .hero .btn-blink.uppercase', function () {
-        var $survey = $('.survey');
-        if ($survey.length && $survey.is(':hidden')) {
-            showSurvey();
+    function init() {
+        // Get Started (hero button)
+        var getStarted = document.querySelector('.landing .hero .btn-blink.uppercase');
+        if (getStarted) {
+            getStarted.addEventListener('click', function () {
+                var survey = document.querySelector('.survey');
+                if (survey && survey.style.display !== 'block') {
+                    showSurvey();
+                }
+            });
         }
-    });
 
-    // Quiz answers: advance to next question or finish
-    $(document).on('click', '.survey .question .btn', function () {
-        var $q = $(this).closest('.question');
-        if ($q.hasClass('question-1')) {
-            goToStep(2);
-        } else if ($q.hasClass('question-2')) {
-            goToStep(3);
-        } else if ($q.hasClass('question-3')) {
-            goToStep(5); // loading step
-            updateProgress(3);
-            setTimeout(function () {
-                showFinal();
-            }, 2500);
-        }
-    });
-})(jQuery);
+        // Quiz answers
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.survey .question .btn');
+            if (!btn) return;
+            var q = btn.closest('.question');
+            if (!q) return;
+
+            if (q.classList.contains('question-1')) {
+                goToStep(2);
+            } else if (q.classList.contains('question-2')) {
+                goToStep(3);
+            } else if (q.classList.contains('question-3')) {
+                goToStep(5);
+                updateProgress(3);
+                setTimeout(showFinal, 2500);
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
