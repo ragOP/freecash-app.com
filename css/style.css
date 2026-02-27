@@ -322,6 +322,27 @@ h5 {
         background-position: -250% 0;
     }
 }
+
+/* Bounce arrow (scroll hint) – bold chevron, visible on dark background */
+.arrow-bounce-wrap {
+    display: block;
+}
+.arrow-bounce {
+    display: inline-block;
+    color: var(--white);
+    font-size: 28px !important;
+    font-weight: 900;
+    -webkit-font-smoothing: antialiased;
+    animation: arrow-bounce 1.5s ease-in-out infinite;
+}
+@keyframes arrow-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(8px);
+    }
+}
 @media screen and (max-width: 767px) {
     h1 {
         font-size: 32px;
