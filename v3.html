@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<!--
+  v3 — Blend: question flow (intro → Q1 → Q2 → congrats + CTA) + richer glass UI,
+  depth, slim progress, compact earnings/trust, and polished congrats. Mobile-first, no big circles.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FreeCash — freecash-app.com</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0b0f;
+      --bg-mid: #12141c;
+      --glass: rgba(255,255,255,0.05);
+      --glass-strong: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.1);
+      --accent: #00e5a0;
+      --accent-soft: rgba(0,229,160,0.25);
+      --accent-glow: rgba(0,229,160,0.12);
+      --text: #e8eaef;
+      --muted: #8b8f9a;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      padding: 0;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .flow {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 1.5rem 5rem;
+      text-align: center;
+    }
+
+    .step {
+      display: none;
+      width: 100%;
+      max-width: 380px;
+      animation: stepIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .step.active { display: block; }
+    .step.out { animation: stepOut 0.35s ease-in forwards; }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes stepOut {
+      to { opacity: 0; transform: translateY(-14px) scale(0.98); }
+    }
+
+    /* Progress bar (slim, no big circles) */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .progress-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--glass-strong);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .progress-fill.step1 { width: 50%; }
+    .progress-fill.step2 { width: 100%; }
+    .progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Intro — glass card */
+    .intro .card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1.75rem 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .intro .live-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+    .intro .live-tag::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .intro h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+      line-height: 1.25;
+    }
+    .intro h1 .hi { color: var(--accent); }
+    .intro .tagline { color: var(--muted); font-size: 0.95rem; margin: 0 0 1rem; }
+    .intro .stat-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .intro .stat-line strong { color: var(--accent); font-weight: 500; }
+    .btn-start {
+      display: inline-block;
+      padding: 0.9rem 1.85rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--accent-soft); }
+    .btn-start:active { transform: translateY(0); }
+
+    /* Questions — glass panel + option cards */
+    .q .card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.35rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .q-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+    .q-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 1.15rem;
+      line-height: 1.4;
+    }
+    .options { display: flex; flex-direction: column; gap: 0.6rem; }
+    .opt {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 1rem 1.2rem;
+      font-family: inherit;
+      font-size: 1rem;
+      text-align: left;
+      color: var(--text);
+      background: var(--glass-strong);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .opt:hover, .opt:focus-visible {
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .opt:active { transform: scale(0.99); }
+    .opt .reward { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); }
+    .opt::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: optShimmer 3s ease-in-out infinite;
+    }
+    .opt:nth-child(2)::after { animation-delay: 0.4s; }
+    .opt:nth-child(3)::after { animation-delay: 0.8s; }
+    @keyframes optShimmer {
+      0% { left: -100%; }
+      40%, 100% { left: 150%; }
+    }
+
+    /* Congrats — exciting, CTA-focused */
+    .congrats .card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1.75rem 1.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .congrats .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.6rem;
+    }
+    .congrats .badge::before {
+      content: '✓';
+      font-weight: 700;
+    }
+    .congrats h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.4rem;
+      color: var(--text);
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .congrats .sub { color: var(--muted); font-size: 0.88rem; margin: 0 0 1rem; line-height: 1.5; }
+    .congrats .perks {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 0.85rem;
+      margin-bottom: 1.35rem;
+    }
+    .congrats .perk {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .congrats .perk span:first-child { font-size: 0.95rem; }
+    /* Main CTA — hero size, focus */
+    .cta-wrap {
+      margin-bottom: 1rem;
+    }
+    .cta-main {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 1.15rem 1.5rem;
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--accent) 0%, #00c484 100%);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px var(--accent-soft), 0 0 0 1px rgba(0,229,160,0.3);
+      letter-spacing: 0.02em;
+    }
+    a.cta-main { -webkit-tap-highlight-color: transparent; }
+    .cta-main:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 36px var(--accent-soft), 0 0 30px rgba(0,229,160,0.2);
+    }
+    .cta-main:active { transform: translateY(0) scale(1); }
+    .cta-main .cta-label { margin-right: 0.35rem; }
+    .congrats .proof {
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--glass-border);
+    }
+    .congrats .proof-quote {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+      margin: 0 0 0.3rem;
+    }
+    .congrats .proof-meta { font-size: 0.75rem; color: var(--muted); }
+    /* Content below main card */
+    .congrats .below-card {
+      margin-top: 1.25rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+    .congrats .below-card .title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 0.5rem;
+    }
+    .congrats .below-card .copy {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .congrats .below-card .stats {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      margin-top: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    .congrats .below-card .stats strong { color: var(--accent); font-weight: 500; }
+
+    /* Header — logo-style */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0.9rem 1.25rem;
+      padding-top: calc(0.9rem + var(--safe-top));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,11,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .site-header .logo {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.15rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+    .site-header .logo:hover { color: var(--accent); }
+    .site-header .logo .brand { color: inherit; }
+    .site-header .logo .domain {
+      font-size: 0.75em;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 0.1em;
+    }
+    .site-header .logo .accent-dot { color: var(--accent); }
+
+    /* Hero — content above cards */
+    .hero {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 4.5rem 1.5rem 0;
+      text-align: center;
+      pointer-events: none;
+    }
+    .hero .hero-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 0.3rem;
+      line-height: 1.35;
+    }
+    .hero .hero-title .accent { color: var(--accent); }
+    .hero .hero-tag {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Shimmer on buttons */
+    .btn-shimmer, .cta-main {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shimmer::after, .cta-main::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.35),
+        transparent
+      );
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0% { left: -100%; }
+      60%, 100% { left: 150%; }
+    }
+
+    /* Footer */
+    .site-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem 1.5rem var(--safe-bottom);
+      text-align: center;
+      border-top: 1px solid var(--glass-border);
+      background: rgba(10,11,15,0.6);
+      backdrop-filter: blur(8px);
+    }
+    .site-footer .footer-brand {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .site-footer .footer-brand a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    .site-footer .footer-brand a:hover { color: var(--accent); }
+    .site-footer .footer-links {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .site-footer .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .site-footer .footer-links a:hover { color: var(--accent); }
+    .site-footer .footer-links span { margin: 0 0.35rem; opacity: 0.6; }
+
+    /* Money pop */
+    .money-pop {
+      position: fixed;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      pointer-events: none;
+      z-index: 9999;
+      animation: moneyPop 1s ease-out forwards;
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+    @keyframes moneyPop {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      30% {
+        transform: translate(-50%, -80%) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -150%) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="https://freecash-app.com" class="logo">
+      <span class="brand">freecash</span><span class="accent-dot">-</span><span class="brand">app</span><span class="domain">.com</span>
+    </a>
+  </header>
+
+  <header class="hero">
+    <h2 class="hero-title">Earn real cash for <span class="accent">playing games</span> & trying apps</h2>
+    <p class="hero-tag">Get a $5 welcome bonus · Same-day payouts</p>
+  </header>
+
+  <div class="flow">
+    <!-- Intro -->
+    <section class="step intro active" id="intro">
+      <div class="card">
+        <p class="live-tag">Live</p>
+        <h1>Turn spare time into <span class="hi">real payouts</span></h1>
+        <p class="tagline">Two quick questions — then see your offer.</p>
+        <p class="stat-line"><strong>147K+</strong> users · <strong>$5</strong> welcome bonus</p>
+        <button type="button" class="btn-start btn-shimmer" data-next="q1">Let’s go</button>
+      </div>
+    </section>
+
+    <!-- Question 1 -->
+    <section class="step q" id="q1">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill step1" id="progress-fill"></div></div>
+        <span class="progress-text">1 of 2</span>
+      </div>
+      <div class="card">
+        <p class="q-label">Question 1</p>
+        <h2 class="q-title">What do you usually do in your free time?</h2>
+        <div class="options">
+          <button type="button" class="opt" data-next="q2">Play games<span class="reward">Up to $150</span></button>
+          <button type="button" class="opt" data-next="q2">Browse or scroll<span class="reward">Surveys</span></button>
+          <button type="button" class="opt" data-next="q2">Try new apps<span class="reward">$5–$80</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Question 2 -->
+    <section class="step q" id="q2">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill step2" id="progress-fill-2"></div></div>
+        <span class="progress-text">2 of 2</span>
+      </div>
+      <div class="card">
+        <p class="q-label">Last one</p>
+        <h2 class="q-title">How would you like to get paid?</h2>
+        <div class="options">
+          <button type="button" class="opt" data-next="congrats">PayPal<span class="reward">Same day</span></button>
+          <button type="button" class="opt" data-next="congrats">Gift cards<span class="reward">Instant</span></button>
+          <button type="button" class="opt" data-next="congrats">Crypto<span class="reward">Fast</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Congrats + CTA -->
+    <section class="step congrats" id="congrats">
+      <div class="card">
+        <p class="badge">You qualify</p>
+        <h2>Congrats — you’re in.</h2>
+        <p class="sub">Get your $5 welcome bonus. Earn by playing games, trying apps & surveys. Same-day payouts.</p>
+        <div class="perks">
+          <span class="perk"><span>🎮</span> Games</span>
+          <span class="perk"><span>📱</span> Apps</span>
+          <span class="perk"><span>📋</span> Surveys</span>
+          <span class="perk"><span>⚡</span> Payout</span>
+        </div>
+        <div class="cta-wrap">
+          <a href="https://fetchtip.com/?a=75&c=1487&s1=" class="cta-main btn-shimmer" id="cta-offer-link">
+            <span class="cta-label">Start earning now</span> →
+          </a>
+        </div>
+        <div class="proof">
+          <p class="proof-quote">"Actually pays. Redeemed $50 with zero issues — smooth and quick."</p>
+          <p class="proof-meta">Mark G. · Verified</p>
+        </div>
+      </div>
+      <div class="below-card">
+        <p class="title">Why FreeCash?</p>
+        <p class="copy">Join 147K+ users who get paid for testing apps and playing games. No minimum to cash out — withdraw anytime via PayPal, gift cards, or crypto.</p>
+        <div class="stats">
+          <span><strong>147K+</strong> users</span>
+          <span><strong>$5</strong> bonus</span>
+          <span><strong>Same-day</strong> pay</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p class="footer-brand"><a href="https://freecash-app.com">freecash-app.com</a></p>
+    <p class="footer-links">
+      <a href="../privacy-policy/">Privacy</a><span>·</span>
+      <a href="../terms-of-use/">Terms</a><span>·</span>
+      <a href="mailto:support@freecash.com">Contact</a>
+    </p>
+  </footer>
+
+  <script>
+    (function() {
+      var steps = document.querySelectorAll('.step');
+      var amounts = ['+$0.50', '+$1', '+$1', '+$2', '+$5']; // weighted so they feel earning
+
+      function spawnMoneyPop(x, y) {
+        var amount = amounts[Math.floor(Math.random() * amounts.length)];
+        var el = document.createElement('span');
+        el.className = 'money-pop';
+        el.textContent = amount;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(function() { el.remove(); }, 1000);
+      }
+
+      function goTo(stepId) {
+        var next = document.getElementById(stepId);
+        if (!next) return;
+        steps.forEach(function(s) {
+          if (s.classList.contains('active')) {
+            s.classList.remove('active');
+            s.classList.add('out');
+            setTimeout(function() { s.classList.remove('out'); }, 350);
+          }
+        });
+        next.classList.add('active');
+      }
+
+      document.addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-next]');
+        var cta = e.target.closest('.cta-main');
+        if (btn) {
+          e.preventDefault();
+          var rect = btn.getBoundingClientRect();
+          spawnMoneyPop(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          goTo(btn.getAttribute('data-next'));
+        }
+        if (cta && cta.href) {
+          var r = cta.getBoundingClientRect();
+          spawnMoneyPop(r.left + r.width / 2, r.top + r.height / 2);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
