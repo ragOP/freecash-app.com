@@ -125,6 +125,17 @@ $(document).ready(function(){
 
     startTimer()
 
+    // CTA: show "Redirection..." on click, then go to final link
+    $(".offer_link").on("click", function (e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const url = $btn.attr("href");
+        $btn.text("Redirecting...").css("pointer-events", "none");
+        setTimeout(function () {
+            window.location.href = url;
+        }, 400);
+    });
+
     function runConfetti() {
         const canvas = document.getElementById("confettiCanvas");
         if (!canvas) return;
