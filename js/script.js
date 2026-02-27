@@ -1,5 +1,20 @@
 let reviewsSwiper = null;
 
+// Meta Pixel: safe wrapper (handles adblock / pixel not loaded)
+function trackMetaEvent(eventName, params) {
+    try {
+        if (typeof fbq !== 'undefined') {
+            if (params && Object.keys(params).length) {
+                fbq('track', eventName, params);
+            } else {
+                fbq('track', eventName);
+            }
+        }
+    } catch (e) {
+        console.warn('Meta Pixel:', e);
+    }
+}
+
 function initReviewsSwiper() {
     const isMobile = window.innerWidth < 768;
 
@@ -36,6 +51,7 @@ $(document).ready(function(){
     $(".mailto").attr("href", "mailto:support@freecash.com")
 
     $(".hero .btn").click(function(){
+        trackMetaEvent('Lead'); // Lead: user started signup/survey flow (Meta standard event)
         $(".hero").fadeOut(0)
         $(".contact").fadeOut(0)
         $(".landing").fadeOut(0)
@@ -77,6 +93,7 @@ $(document).ready(function(){
         console.log(step)
 
         if (step >= 4) {
+            trackMetaEvent('CompleteRegistration'); // Survey completed = conversion (Meta standard event)
             $(".quiz .step").fadeOut(0);
             $(".quiz .description").fadeOut(0);
             
@@ -130,6 +147,7 @@ $(document).ready(function(){
         e.preventDefault();
         const $btn = $(this);
         const url = $btn.attr("href");
+        trackMetaEvent('InitiateCheckout'); // User clicked main CTA (Meta standard event)
         $btn.text("Redirecting...").css("pointer-events", "none");
         setTimeout(function () {
             window.location.href = url;
