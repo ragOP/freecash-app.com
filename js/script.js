@@ -9,6 +9,9 @@ function trackMetaEvent(eventName, params) {
             } else {
                 fbq('track', eventName);
             }
+            console.log('[Meta Pixel] Event sent:', eventName);
+        } else {
+            console.warn('[Meta Pixel] fbq not loaded (e.g. adblocker) – event not sent:', eventName);
         }
     } catch (e) {
         console.warn('Meta Pixel:', e);
