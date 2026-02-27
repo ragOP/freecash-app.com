@@ -51,7 +51,6 @@ $(document).ready(function(){
     $(".mailto").attr("href", "mailto:support@freecash.com")
 
     $(".hero .btn").click(function(){
-        trackMetaEvent('Lead'); // Lead: user started signup/survey flow (Meta standard event)
         $(".hero").fadeOut(0)
         $(".contact").fadeOut(0)
         $(".landing").fadeOut(0)
@@ -147,7 +146,7 @@ $(document).ready(function(){
         e.preventDefault();
         const $btn = $(this);
         const url = $btn.attr("href");
-        trackMetaEvent('InitiateCheckout'); // User clicked main CTA (Meta standard event)
+        trackMetaEvent('Lead'); // Lead: user clicked "START EARNING NOW" (Meta standard event)
         $btn.text("Redirecting...").css("pointer-events", "none");
         setTimeout(function () {
             window.location.href = url;
