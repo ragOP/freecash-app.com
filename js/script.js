@@ -95,7 +95,6 @@ $(document).ready(function(){
         console.log(step)
 
         if (step >= 4) {
-            trackMetaEvent('CompleteRegistration'); // Survey completed = conversion (Meta standard event)
             $(".quiz .step").fadeOut(0);
             $(".quiz .description").fadeOut(0);
             
