@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Domain Verification Guide – freecash-app.com</title>
+    <style>
+        @media print { body { max-width: 100%; } }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1.5rem; color: #1a1a1a; line-height: 1.6; }
+        h1 { font-size: 1.5rem; border-bottom: 2px solid #1877f2; padding-bottom: 0.5rem; }
+        h2 { font-size: 1.15rem; margin-top: 1.5rem; color: #1877f2; }
+        p { margin: 0.5rem 0 1rem; }
+        ol, ul { margin: 0.5rem 0 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.4rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { border: 1px solid #ddd; padding: 0.5rem 0.75rem; text-align: left; }
+        th { background: #f0f2f5; }
+        code { background: #f0f2f5; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; }
+        .note { background: #f0f8ff; border-left: 4px solid #1877f2; padding: 0.75rem 1rem; margin: 1rem 0; }
+        .footer { margin-top: 2rem; font-size: 0.85rem; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>How to Verify freecash-app.com with Meta (Facebook)</h1>
+    <p>Use this guide to verify your domain in Meta Business Suite so your Pixel and Events Manager work correctly for freecash-app.com.</p>
+
+    <h2>1. Open domain settings in Meta</h2>
+    <ol>
+        <li>Go to <strong>Meta Business Suite</strong>: <a href="https://business.facebook.com">business.facebook.com</a> — log in.</li>
+        <li>Click the <strong>gear icon (Settings)</strong> → <strong>Business settings</strong>.</li>
+        <li>In the left menu, open <strong>Brand Safety</strong> → <strong>Domains</strong> (or <strong>Accounts</strong> → <strong>Domains</strong>, depending on your menu).</li>
+        <li>Click <strong>Add</strong> → <strong>Add a domain</strong>.</li>
+        <li>Enter: <code>freecash-app.com</code> (no <code>https://</code> or <code>www</code>).</li>
+        <li>Click <strong>Add</strong> and then <strong>Verify domain</strong>.</li>
+    </ol>
+    <p>Meta will show you <strong>two verification options</strong>. Use one of them below.</p>
+
+    <h2>2. Option A: Verify with a DNS TXT record (recommended)</h2>
+    <ol>
+        <li>In Meta, choose <strong>“Verify using DNS”</strong> (or <strong>TXT record</strong>).</li>
+        <li>Meta shows a <strong>TXT record</strong> you must add (e.g. <code>facebook-domain-verification=xxxxxxxxxxxxxxxx</code>).</li>
+        <li>In your <strong>domain/DNS provider</strong> (where you manage freecash-app.com — e.g. Cloudflare, Namecheap, GoDaddy):
+            <ul>
+                <li>Add a <strong>TXT</strong> record.</li>
+                <li><strong>Host / Name:</strong> <code>@</code> or <code>freecash-app.com</code> (or leave blank if that’s how your host means “root domain”).</li>
+                <li><strong>Value / Content:</strong> paste the <strong>exact</strong> value Meta gave you (e.g. <code>facebook-domain-verification=…</code>).</li>
+                <li>Save.</li>
+            </ul>
+        </li>
+        <li>Wait <strong>a few minutes to 72 hours</strong> for DNS to update.</li>
+        <li>Back in Meta, click <strong>Verify</strong>.</li>
+    </ol>
+
+    <h2>3. Option B: Verify with an HTML file</h2>
+    <ol>
+        <li>In Meta, choose <strong>“Verify using HTML file”</strong>.</li>
+        <li><strong>Download</strong> the verification file Meta gives you (e.g. <code>facebook-domain-verification-xxxxx.html</code>).</li>
+        <li>Upload that file to the <strong>root</strong> of your website so it’s available at:
+            <br><code>https://freecash-app.com/facebook-domain-verification-xxxxx.html</code>
+        </li>
+        <li>No redirects: the URL must return that file with <strong>200</strong> and the exact contents Meta provided.</li>
+        <li>In Meta, click <strong>Verify</strong>.</li>
+    </ol>
+    <div class="note">If your site is static (e.g. this repo), put the downloaded file in the <strong>root</strong> of what you deploy (same level as <code>index.html</code>), then redeploy.</div>
+
+    <h2>4. After verification</h2>
+    <ul>
+        <li>The domain will show as <strong>Verified</strong> in Business settings → Domains.</li>
+        <li>In <strong>Events Manager</strong>, your Pixel can be associated with freecash-app.com.</li>
+        <li>Under <strong>Aggregated Event Measurement</strong> / <strong>Configure Web Events</strong>, you can assign the verified domain to your Pixel and choose which events to send.</li>
+    </ul>
+
+    <h2>Quick checklist</h2>
+    <table>
+        <thead>
+            <tr><th>Step</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Business Settings → Brand Safety → Domains → Add <strong>freecash-app.com</strong></td></tr>
+            <tr><td>2</td><td>Choose <strong>DNS TXT</strong> or <strong>HTML file</strong></td></tr>
+            <tr><td>3</td><td>Add the TXT record at your DNS host <strong>or</strong> upload the HTML file to site root</td></tr>
+            <tr><td>4</td><td>Click <strong>Verify</strong> in Meta</td></tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Meta Business Help: <a href="https://www.facebook.com/business/help/2058515294227817">Verify your business in Meta Business Suite</a></p>
+        <p>To save as PDF: open this file in a browser → File → Print → choose “Save as PDF” (or “Print to PDF”) → Save.</p>
+    </div>
+</body>
+</html>
