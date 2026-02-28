@@ -815,12 +815,17 @@ function updateStateUI(s) {
 }
 
 updateStateUI('your area');
-fetch('https://ipapi.co/json/?fields=region,country_code', { method:'GET', mode:'cors', credentials:'omit' })
+fetch('https://ipinfo.io/json', { method:'GET', mode:'cors', credentials:'omit' })
   .then(r=>r.json())
   .then(d=>{
-    if (d && d.region) updateStateUI(d.region);
+    if (d && (d.region || d.city)) updateStateUI(d.region || d.city);
   })
-  .catch(()=>{});
+  .catch(()=>{
+    fetch('https://ipapi.co/json/?fields=region,country_code', { method:'GET', mode:'cors', credentials:'omit' })
+      .then(r=>r.json())
+      .then(d=>{ if (d && d.region) updateStateUI(d.region); })
+      .catch(()=>{});
+  });
 
 const citiesMap = {
   'Texas':['Austin, TX','Houston, TX','Dallas, TX'],
