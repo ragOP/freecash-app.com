@@ -576,7 +576,7 @@ html, body {
     <div class="ps-div"></div>
     <div class="ps-item"><div class="ps-val">$127<span class="g">M</span></div><div class="ps-lbl">Paid out</div></div>
     <div class="ps-div"></div>
-    <div class="ps-item"><div class="ps-val">4.<span class="g">8</span>★</div><div class="ps-lbl">App Store</div></div>
+    <div class="ps-item"><div class="ps-val">4.<span class="g">8</span>★</div><div class="ps-lbl" id="proof-store">App Store</div></div>
   </div>
 
 </div>
@@ -736,7 +736,7 @@ html, body {
 
   <!-- CTA — our established style -->
   <div class="result-cta-wrap">
-    <a href="https://fetchtip.com/?a=75&c=1487&s1=" class="result-cta" id="result-cta-btn">
+    <a href="#" class="result-cta" id="result-cta-btn">
       <div class="rc-inner">
         <span id="result-cta-icon"></span>
         <span id="result-cta-txt">Tap Here To Download Now</span>
@@ -768,7 +768,7 @@ const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platf
 const isAndroid = /Android/.test(navigator.userAgent);
 const useIOS    = isIOS||!isAndroid;
 
-// Detect approximate device name
+// Detect approximate device name (dynamic for iOS/Android)
 function getDeviceName() {
   const ua = navigator.userAgent;
   if(/iPhone/.test(ua)) return 'iPhone';
@@ -776,14 +776,21 @@ function getDeviceName() {
   if(/Pixel/.test(ua)) return 'Google Pixel';
   if(/Samsung|SM-/.test(ua)) return 'Samsung Galaxy';
   if(/OnePlus/.test(ua)) return 'OnePlus';
+  if(/Xiaomi|Redmi/.test(ua)) return 'Xiaomi';
+  if(/Oppo/.test(ua)) return 'Oppo';
+  if(/Vivo/.test(ua)) return 'Vivo';
+  if(/Realme/.test(ua)) return 'Realme';
   if(/Android/.test(ua)) return 'Android Phone';
-  return 'iPhone'; // default for desktop preview
+  return isIOS ? 'iPhone' : 'Android Phone';
 }
 
-// Store label / CTA
+// Store URLs & labels (dynamic for iOS/Android)
+const appStoreUrl = 'https://apps.apple.com/us/app/freecash-get-paid-real-money/id1673567402';
+const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.freecash.app2';
+const storeUrl = useIOS ? appStoreUrl : playStoreUrl;
 const storeLabel = useIOS ? 'App Store' : 'Play Store';
 const storeDesc  = useIOS ? 'Free · opens App Store · 30 sec' : 'Free · opens Play Store · 30 sec';
-const ctaTxt     = 'Tap Here To Download Now';
+const ctaTxt     = useIOS ? 'Download on App Store' : 'Download on Play Store';
 const ratingNum  = useIOS ? '4.8' : '4.7';
 const ratingCt   = useIOS ? '127K Ratings' : '89K Ratings';
 
@@ -802,6 +809,9 @@ const playIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
 const useIcon = useIOS ? appleIcon : playIcon;
 document.getElementById('result-cta-icon').innerHTML = useIcon;
 document.getElementById('result-cta-txt').textContent = ctaTxt;
+document.getElementById('result-cta-btn').href = storeUrl;
+const proofStore = document.getElementById('proof-store');
+if(proofStore) proofStore.textContent = storeLabel;
 
 // ── STATE: call API, render state name from response ──
 let state = 'your area';
