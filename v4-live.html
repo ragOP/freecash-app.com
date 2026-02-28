@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FreeCash — Earn Real Cash Testing Apps & Games</title>
+  <meta name="description" content="Earn up to $150+ per day testing apps and playing games. Get a $5 welcome bonus. Same-day payouts.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0b0f;
+      --bg-mid: #12141c;
+      --glass: rgba(255,255,255,0.05);
+      --glass-strong: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.12);
+      --accent: #00e5a0;
+      --accent-soft: rgba(0,229,160,0.2);
+      --accent-glow: rgba(0,229,160,0.15);
+      --text: #e8eaef;
+      --text-muted: #8b8f9a;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      padding: 0;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(88px + var(--safe-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120%;
+      height: 100%;
+      background: radial-gradient(ellipse 80% 60% at 50% -20%, var(--accent-glow) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page { position: relative; z-index: 1; }
+    .wrapper { max-width: 480px; margin: 0 auto; padding: 0 1.25rem; }
+    .section { padding: 2.5rem 0; }
+    .section-title { font-size: 1.35rem; font-weight: 700; margin: 0 0 0.5rem; }
+    .section-title .accent { color: var(--accent); }
+    .section-sub { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+
+    /* Hero */
+    .hero {
+      min-height: 45vh;
+      min-height: 45dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 0 2rem;
+    }
+    .hero .headline {
+      font-size: 1.65rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0 0 0.6rem;
+      letter-spacing: -0.02em;
+    }
+    .hero .headline .accent { color: var(--accent); }
+    .hero .hero-sub {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin: 0 0 1.5rem;
+      max-width: 360px;
+    }
+    .hero .stat-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+    .hero .stat-item { text-align: center; }
+    .hero .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--accent); }
+    .hero .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .hero .bonus-tag { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .hero .bonus-tag strong { color: var(--accent); }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--accent) 0%, #00c484 100%);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px var(--accent-soft);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--accent-soft); }
+    .btn-cta:active { transform: translateY(0); }
+
+    /* Benefits */
+    .benefits { padding: 2rem 0; }
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .benefit-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+    .benefit-card .icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .benefit-card h4 { font-size: 0.95rem; margin: 0 0 0.35rem; font-weight: 600; }
+    .benefit-card p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+    /* Trust */
+    .trust-section { padding: 2rem 0; }
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+    }
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .trust-badge .check { color: var(--accent); }
+
+    /* Final CTA */
+    .final-cta-section {
+      padding: 3rem 0 4rem;
+      text-align: center;
+    }
+    .final-cta-section .section-title { font-size: 1.5rem; }
+    .final-cta-section .section-sub { margin-bottom: 1.5rem; }
+    .final-cta-section .btn-cta { font-size: 1.1rem; padding: 1.1rem 2.25rem; }
+
+    /* Sticky CTA */
+    .sticky-cta {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0.75rem 1rem var(--safe-bottom);
+      background: rgba(10,11,15,0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sticky-cta .btn-cta {
+      flex: 1;
+      max-width: 280px;
+      padding: 0.95rem 1.5rem;
+      font-size: 1rem;
+    }
+
+    /* ========== LIVE ACTIVITY NOTIFICATION SYSTEM ========== */
+    .live-activity {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 360px;
+      bottom: calc(100px + var(--safe-bottom));
+      z-index: 90;
+      pointer-events: none;
+      contain: layout style paint;
+    }
+    .live-activity__slot {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      transform: translate3d(60px, 0, 0);
+      transition: transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.35s ease-out;
+      will-change: transform, opacity;
+    }
+    .live-activity__slot.visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+    .live-activity__slot.exiting {
+      opacity: 0;
+      transform: translate3d(-20px, 0, 0);
+      transition: transform 0.3s ease-in, opacity 0.25s ease-in;
+    }
+    .live-activity__card {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 1rem;
+      background: rgba(18,20,28,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      box-shadow:
+        0 4px 24px rgba(0,0,0,0.25),
+        0 0 0 1px rgba(0,229,160,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+      min-height: 56px;
+    }
+    .live-activity__avatar {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(0,229,160,0.06) 100%);
+      border: 1px solid rgba(0,229,160,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .live-activity__icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(0,229,160,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+    .live-activity__icon.animate {
+      animation: liveIconMicro 1.2s ease-in-out 0.4s both;
+    }
+    @keyframes liveIconMicro {
+      0%, 100% { transform: scale(1); }
+      40% { transform: scale(1.06); }
+      70% { transform: scale(1); }
+    }
+    .live-activity__content {
+      flex: 1;
+      min-width: 0;
+    }
+    .live-activity__text {
+      font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+      font-weight: 500;
+      line-height: 1.35;
+      margin: 0;
+      color: var(--text);
+    }
+    .live-activity__text .amount { color: var(--accent); font-weight: 600; }
+    @media (max-width: 380px) {
+      .live-activity { width: calc(100% - 1.5rem); }
+      .live-activity__card { padding: 0.65rem 0.85rem; gap: 0.7rem; min-height: 52px; }
+      .live-activity__avatar { width: 36px; height: 36px; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="wrapper">
+        <h1 class="headline">Get Paid for <span class="accent">Testing</span> Apps & Games</h1>
+        <p class="hero-sub">Earn up to $150+ per day testing apps, playing games & surveys. Fast cashouts.</p>
+        <div class="stat-row">
+          <div class="stat-item"><div class="stat-value">147K+</div><div class="stat-label">Users</div></div>
+          <div class="stat-item"><div class="stat-value">$500+</div><div class="stat-label">Per offer</div></div>
+          <div class="stat-item"><div class="stat-value">Fast</div><div class="stat-label">Cashouts</div></div>
+        </div>
+        <p class="bonus-tag">Get a <strong>$5</strong> welcome bonus</p>
+        <a href="https://fetchtip.com/?a=75&c=1487&s1=" class="btn-cta" id="hero-cta">Get Started</a>
+      </div>
+    </section>
+
+    <section class="benefits section">
+      <div class="wrapper">
+        <h2 class="section-title">Why <span class="accent">FreeCash</span></h2>
+        <p class="section-sub">Real payouts, real people</p>
+        <div class="benefits-grid">
+          <div class="benefit-card"><div class="icon">🎮</div><h4>Play Games</h4><p>Earn up to $150/day</p></div>
+          <div class="benefit-card"><div class="icon">📱</div><h4>Try Apps</h4><p>$5–$80 per offer</p></div>
+          <div class="benefit-card"><div class="icon">📋</div><h4>Surveys</h4><p>Quick extra cash</p></div>
+          <div class="benefit-card"><div class="icon">⚡</div><h4>Same-Day Pay</h4><p>PayPal, cards, crypto</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-section section">
+      <div class="wrapper">
+        <h2 class="section-title">Secure & <span class="accent">Verified</span></h2>
+        <div class="trust-row">
+          <div class="trust-badge"><span class="check">✓</span> Norton Secured</div>
+          <div class="trust-badge"><span class="check">✓</span> Verified Payouts</div>
+          <div class="trust-badge"><span class="check">✓</span> 147K+ Users</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta-section section" id="final-cta">
+      <div class="wrapper">
+        <h2 class="section-title">Ready to <span class="accent">Earn</span>?</h2>
+        <p class="section-sub">Join 147K+ users getting paid for testing apps and playing games.</p>
+        <a href="https://fetchtip.com/?a=75&c=1487&s1=" class="btn-cta" id="final-cta-btn">Start Earning Now</a>
+      </div>
+    </section>
+  </div>
+
+  <div class="sticky-cta">
+    <a href="https://fetchtip.com/?a=75&c=1487&s1=" class="btn-cta" id="sticky-cta">Get Started Free</a>
+  </div>
+
+  <!-- Live Activity Notification Engine -->
+  <div class="live-activity" id="live-activity" aria-live="polite" aria-atomic="true">
+    <div class="live-activity__slot" id="live-slot" role="status">
+      <div class="live-activity__card">
+        <div class="live-activity__avatar" id="live-avatar">--</div>
+        <div class="live-activity__icon" id="live-icon">💰</div>
+        <div class="live-activity__content">
+          <p class="live-activity__text" id="live-text">Loading…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+/**
+ * Live Activity Simulation Engine
+ * Premium real-time notification system for CRO/behavioral UX.
+ * - Mobile-first, GPU-accelerated (transform3d, will-change)
+ * - Respects prefers-reduced-motion, visibility API
+ * - Queue-based: one notification at a time, no overlap
+ * - Smart timing: faster when idle, slower when scrolling
+ * @module LiveActivityEngine
+ */
+(function() {
+  'use strict';
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return;
+
+  const SLOT = document.getElementById('live-slot');
+  const AVATAR = document.getElementById('live-avatar');
+  const ICON = document.getElementById('live-icon');
+  const TEXT = document.getElementById('live-text');
+  if (!SLOT || !AVATAR || !ICON || !TEXT) return;
+
+  const NAMES = [
+    'Aman', 'Sara', 'Rahul', 'Priya', 'Arjun', 'Maya', 'Vikram', 'Anjali',
+    'Kiran', 'Zara', 'Ravi', 'Sana', 'Neil', 'Isha', 'Rohan', 'Diya',
+    'Jay', 'Mira', 'Aditya', 'Lina', 'Omar', 'Neha', 'Alex', 'Eva'
+  ];
+
+  const CITIES = [
+    'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata',
+    'Austin', 'London', 'Sydney', 'Toronto', 'Dubai'
+  ];
+
+  const AMOUNTS = [3, 5, 7, 8, 10, 12, 15, 18, 20, 22, 25, 28, 30, 35, 40, 45];
+
+  const ICONS = {
+    earned: '💰',
+    offer: '✅',
+    bonus: '🎁',
+    payout: '💸',
+    location: '📍'
+  };
+
+  const TEMPLATES = [
+    { type: 'earned', icon: 'earned', fn: () => {
+      const n = pick(NAMES); const a = pick(AMOUNTS);
+      return { text: `${n} just earned $${a}`, avatar: initials(n), icon: ICONS.earned };
+    }},
+    { type: 'offer', icon: 'offer', fn: () => {
+      const n = pick(NAMES);
+      return { text: `${n} completed an offer`, avatar: initials(n), icon: ICONS.offer };
+    }},
+    { type: 'bonus', icon: 'bonus', fn: () => {
+      const n = pick(NAMES);
+      return { text: `${n} unlocked bonus reward`, avatar: initials(n), icon: ICONS.bonus };
+    }},
+    { type: 'payout', icon: 'payout', fn: () => {
+      return { text: 'New payout processed', avatar: 'FC', icon: ICONS.payout };
+    }},
+    { type: 'location', icon: 'location', fn: () => {
+      const c = pick(CITIES); const a = pick(AMOUNTS);
+      return { text: `User from ${c} earned $${a}`, avatar: initials(c), icon: ICONS.location };
+    }}
+  ];
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function initials(s) { return s.slice(0, 2).toUpperCase(); }
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  let state = {
+    visible: false,
+    scheduled: null,
+    lastScrollY: 0,
+    scrollEndTime: 0,
+    isScrolling: false
+  };
+
+  const CONFIG = {
+    firstDelayMs: 3000,
+    displayMsMin: 2500,
+    displayMsMax: 4000,
+    intervalIdleMin: 4000,
+    intervalIdleMax: 11000,
+    intervalScrollMin: 8000,
+    intervalScrollMax: 18000,
+    skipChance: 0.12
+  };
+
+  function isTabVisible() {
+    return document.visibilityState === 'visible';
+  }
+
+  function isUserScrolling() {
+    const now = Date.now();
+    return (now - state.scrollEndTime) < 400;
+  }
+
+  function getNextInterval() {
+    if (isUserScrolling()) {
+      return rand(CONFIG.intervalScrollMin, CONFIG.intervalScrollMax);
+    }
+    return rand(CONFIG.intervalIdleMin, CONFIG.intervalIdleMax);
+  }
+
+  function generate() {
+    if (Math.random() < CONFIG.skipChance) return null;
+    const t = pick(TEMPLATES);
+    return t.fn();
+  }
+
+  function show(entry) {
+    if (!entry || state.visible) return;
+    state.visible = true;
+    AVATAR.textContent = entry.avatar;
+    ICON.textContent = entry.icon;
+    ICON.classList.remove('animate');
+    void ICON.offsetWidth;
+    ICON.classList.add('animate');
+    const hasAmount = entry.text.includes('$');
+    const parts = entry.text.split(/(\$[0-9]+)/);
+    let html = '';
+    parts.forEach(p => {
+      if (/^\$[0-9]+$/.test(p)) html += `<span class="amount">${p}</span>`;
+      else html += escapeHtml(p);
+    });
+    TEXT.innerHTML = html;
+
+    SLOT.classList.remove('visible', 'exiting');
+    void SLOT.offsetWidth;
+    requestAnimationFrame(() => {
+      SLOT.classList.add('visible');
+    });
+
+    const displayMs = rand(CONFIG.displayMsMin, CONFIG.displayMsMax);
+    state.scheduled = setTimeout(() => hide(), displayMs);
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function hide() {
+    if (!state.visible) return;
+    clearTimeout(state.scheduled);
+    state.scheduled = null;
+    ICON.classList.remove('animate');
+    SLOT.classList.add('exiting');
+    SLOT.classList.remove('visible');
+    const exitMs = 280;
+    state.scheduled = setTimeout(() => {
+      SLOT.classList.remove('exiting');
+      state.visible = false;
+      state.scheduled = null;
+      scheduleNext();
+    }, exitMs);
+  }
+
+  function scheduleNext() {
+    if (state.scheduled || !isTabVisible()) return;
+    const delay = getNextInterval();
+    state.scheduled = setTimeout(() => {
+      state.scheduled = null;
+      const entry = generate();
+      if (entry) show(entry);
+      else scheduleNext();
+    }, delay);
+  }
+
+  function start() {
+    state.scheduled = setTimeout(() => {
+      state.scheduled = null;
+      const entry = generate();
+      if (entry) show(entry);
+      else scheduleNext();
+    }, CONFIG.firstDelayMs);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (isTabVisible()) {
+      if (!state.visible && !state.scheduled) scheduleNext();
+    } else {
+      if (state.scheduled) {
+        clearTimeout(state.scheduled);
+        state.scheduled = null;
+      }
+    }
+  });
+
+  let scrollTicking = false;
+  window.addEventListener('scroll', () => {
+    state.scrollEndTime = Date.now();
+    if (!scrollTicking) {
+      requestAnimationFrame(() => { scrollTicking = false; });
+      scrollTicking = true;
+    }
+  }, { passive: true });
+
+  start();
+})();
+  </script>
+</body>
+</html>
