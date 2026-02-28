@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FreeCash — Device Check</title>
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: none;
+}
+
+:root {
+  --bg:     #111214;
+  --bg2:    #1A1C1F;
+  --card:   #1E2024;
+  --card2:  #252830;
+  --green:  #22C55E;
+  --green2: #16A34A;
+  --green-glow: rgba(34,197,94,0.25);
+  --blue:   #3B82F6;
+  --label:  #FFFFFF;
+  --label2: rgba(255,255,255,0.55);
+  --label3: rgba(255,255,255,0.25);
+  --sep:    rgba(255,255,255,0.08);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--label);
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════ */
+.screen {
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 40px;
+}
+
+/* Show/hide screens */
+#screen-check  { display: flex; }
+#screen-scan   { display: none; }
+#screen-result { display: none; }
+
+
+/* ═══════════════════════════════════════
+   SCREEN 1 — CHECK
+═══════════════════════════════════════ */
+#screen-check {
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px 40px;
+}
+
+/* Status bar */
+.status-bar {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 4px 8px;
+}
+.sb-time { font-size: 15px; font-weight: 600; }
+.sb-right { display: flex; align-items: center; gap: 6px; }
+.sig-bars { display: flex; align-items: flex-end; gap: 1.5px; }
+.sig-bar { width: 3px; border-radius: 1px; background: var(--label); }
+.battery { width: 25px; height: 12px; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 3px; position: relative; display: flex; align-items: center; padding: 1.5px; }
+.battery::after { content:''; position:absolute; right:-4px; top:50%; transform:translateY(-50%); width:2px; height:5px; background:rgba(255,255,255,0.35); border-radius:1px; }
+.battery-fill { height:100%; background:var(--green); border-radius:1.5px; width:38%; }
+
+/* Logo */
+.logo-wrap {
+  margin: 28px 0 32px;
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo-text span { color: var(--green); }
+
+/* Hero copy */
+.hero-tag {
+  background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 12px; font-weight: 700; color: var(--green);
+  letter-spacing: 0.3px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 6px;
+}
+.hero-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: blink 1.4s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hero-heading {
+  font-size: 30px; font-weight: 800; letter-spacing: -0.8px;
+  line-height: 1.15; text-align: center; margin-bottom: 14px;
+}
+.hero-heading span { color: var(--green); }
+
+.hero-sub {
+  font-size: 16px; color: var(--label2); text-align: center;
+  line-height: 1.6; margin-bottom: 36px; max-width: 300px;
+}
+
+/* Phone preview */
+.phone-preview {
+  width: 100%; background: var(--card);
+  border: 1px solid var(--sep); border-radius: 20px;
+  padding: 20px; margin-bottom: 32px;
+  position: relative; overflow: hidden;
+}
+.phone-preview::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(34,197,94,0.08) 0%, transparent 70%);
+}
+.pp-title {
+  font-size: 13px; font-weight: 700; color: var(--label2);
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px;
+}
+.pp-rows { display: flex; flex-direction: column; gap: 10px; }
+.pp-row { display: flex; align-items: center; justify-content: space-between; }
+.pp-label { font-size: 14px; color: var(--label2); display: flex; align-items: center; gap: 8px; }
+.pp-label svg { opacity: 0.5; }
+.pp-val { font-size: 14px; font-weight: 600; color: var(--label); }
+.pp-val.green { color: var(--green); }
+.pp-val.unknown { color: var(--label2); }
+.pp-sep { height: 0.5px; background: var(--sep); }
+
+/* Check button */
+.check-btn {
+  width: 100%; padding: 18px 20px;
+  background: var(--green); border: none; border-radius: 16px;
+  font-family: inherit; font-size: 17px; font-weight: 700; color: #000;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  position: relative; overflow: hidden;
+  letter-spacing: -0.2px;
+  box-shadow: 0 4px 28px var(--green-glow), 0 0 0 0 var(--green-glow);
+  animation: btnpulse 2.5s ease-in-out infinite;
+}
+@keyframes btnpulse {
+  0%,100% { box-shadow: 0 4px 28px rgba(34,197,94,0.3); }
+  50%      { box-shadow: 0 4px 44px rgba(34,197,94,0.55); }
+}
+.check-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+}
+.check-btn:active { opacity: 0.85; }
+.btn-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; }
+
+.check-note {
+  font-size: 12px; color: var(--label3); text-align: center;
+  margin-top: 12px; line-height: 1.5;
+}
+
+/* Social proof strip */
+.proof-strip {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  margin-top: 28px; padding-top: 24px;
+  border-top: 0.5px solid var(--sep);
+  width: 100%;
+}
+.ps-item { text-align: center; }
+.ps-val { font-size: 18px; font-weight: 800; color: var(--label); letter-spacing: -0.5px; }
+.ps-val .g { color: var(--green); }
+.ps-lbl { font-size: 11px; color: var(--label2); margin-top: 2px; }
+.ps-div { width: 0.5px; height: 30px; background: var(--sep); }
+
+
+/* ═══════════════════════════════════════
+   SCREEN 2 — SCAN ANIMATION
+═══════════════════════════════════════ */
+#screen-scan {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  min-height: 100vh;
+}
+
+.scan-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 48px;
+}
+.scan-logo-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+}
+.scan-logo-text { font-size: 20px; font-weight: 800; }
+.scan-logo-text span { color: var(--green); }
+
+/* Phone device graphic */
+.device-wrap {
+  position: relative; margin-bottom: 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.device-phone {
+  width: 120px; height: 200px; border-radius: 22px;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: var(--card2);
+  position: relative; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.5);
+}
+.device-screen {
+  position: absolute; inset: 6px; border-radius: 16px;
+  background: var(--card);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  overflow: hidden;
+}
+/* Scan line sweeping across phone screen */
+.scan-line {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--green) 30%, rgba(34,197,94,0.8) 50%, var(--green) 70%, transparent 100%);
+  top: -2px;
+  animation: scanMove 1.8s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--green), 0 0 24px rgba(34,197,94,0.4);
+}
+@keyframes scanMove {
+  0%   { top: -2px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: calc(100% + 2px); opacity: 0; }
+}
+
+/* Corners around phone — targeting reticle feel */
+.corner {
+  position: absolute; width: 20px; height: 20px;
+  border-color: var(--green); border-style: solid;
+  animation: cornerFade 1s ease-in-out infinite alternate;
+}
+@keyframes cornerFade { 0%{opacity:0.4} 100%{opacity:1} }
+.corner-tl { top: -6px; left: -6px; border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+.corner-tr { top: -6px; right: -6px; border-width: 2px 2px 0 0; border-radius: 0 3px 0 0; }
+.corner-bl { bottom: -6px; left: -6px; border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+.corner-br { bottom: -6px; right: -6px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+
+/* Ripple rings around phone */
+.ripple-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(34,197,94,0.3);
+  animation: rippleOut 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.ripple-ring:nth-child(1) { width: 200px; height: 200px; animation-delay: 0s; }
+.ripple-ring:nth-child(2) { width: 260px; height: 260px; animation-delay: 0.6s; }
+.ripple-ring:nth-child(3) { width: 320px; height: 320px; animation-delay: 1.2s; }
+@keyframes rippleOut {
+  0%   { opacity: 0.6; transform: scale(0.7); }
+  100% { opacity: 0;   transform: scale(1.1); }
+}
+
+/* Check items */
+.scan-status {
+  font-size: 13px; font-weight: 700; color: var(--green);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 6px;
+  animation: statusPulse 1s ease-in-out infinite alternate;
+}
+@keyframes statusPulse { 0%{opacity:0.6} 100%{opacity:1} }
+
+.scan-step-label {
+  font-size: 17px; font-weight: 600; color: var(--label);
+  text-align: center; letter-spacing: -0.3px; margin-bottom: 4px;
+  min-height: 26px;
+}
+.scan-step-sub {
+  font-size: 13px; color: var(--label2); text-align: center;
+  min-height: 20px;
+}
+
+/* Progress track */
+.scan-progress-wrap { width: 100%; margin-top: 32px; }
+.scan-prog-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.scan-prog-lbl { font-size: 12px; color: var(--label2); font-weight: 500; }
+.scan-prog-pct { font-size: 12px; color: var(--green); font-weight: 700; }
+.scan-prog-track {
+  height: 5px; background: rgba(255,255,255,0.08);
+  border-radius: 100px; overflow: hidden;
+}
+.scan-prog-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--green2), var(--green));
+  border-radius: 100px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px var(--green);
+}
+
+/* Completed checks ticker */
+.checks-list {
+  width: 100%; margin-top: 20px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.check-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--label2);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.check-item.done {
+  opacity: 1; transform: translateY(0);
+  color: var(--label);
+}
+.check-tick {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.check-tick.pass { background: var(--green); }
+.check-tick.pass svg { display: block; }
+
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — RESULT (matches screenshot)
+═══════════════════════════════════════ */
+#screen-result {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.result-status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px 8px;
+  background: var(--bg);
+}
+
+/* Freecash logo — text version matching screenshot */
+.result-logo {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 16px 24px 8px;
+  background: var(--bg);
+}
+.rl-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+}
+.rl-text {
+  font-size: 22px; font-weight: 900; letter-spacing: -0.3px;
+}
+.rl-text .green { color: var(--green); }
+
+.result-body { padding: 0 16px; }
+
+/* Congrats card */
+.congrats-card {
+  background: var(--card);
+  border-radius: 20px; padding: 28px 20px 24px;
+  text-align: center; margin-bottom: 14px;
+  border: 1px solid rgba(34,197,94,0.15);
+  position: relative; overflow: hidden;
+  animation: cardIn 0.5s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.congrats-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(34,197,94,0.12) 0%, transparent 70%);
+}
+
+/* Confetti dots decoration */
+.confetti { position: absolute; top: 0; left: 0; right: 0; height: 60px; overflow: hidden; pointer-events: none; }
+.c-dot {
+  position: absolute; width: 6px; height: 6px; border-radius: 1px;
+  animation: confettiFall 2s ease both;
+}
+@keyframes confettiFall {
+  0%   { opacity: 1; transform: translateY(-10px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(55px) rotate(360deg); }
+}
+
+.qual-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 12px; font-weight: 700; color: var(--green);
+  margin-bottom: 14px; position: relative;
+}
+.congrats-heading {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+  line-height: 1.2; margin-bottom: 6px; position: relative;
+}
+.congrats-sub {
+  font-size: 15px; color: var(--label2); line-height: 1.5; position: relative;
+}
+.congrats-sub b { color: var(--green); font-weight: 700; }
+
+/* Weekly earnings preview */
+.earn-preview {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: rgba(34,197,94,0.1); border-radius: 12px; padding: 12px;
+  margin-top: 16px; position: relative;
+}
+.ep-val { font-size: 28px; font-weight: 800; color: var(--green); letter-spacing: -1px; }
+.ep-lbl { font-size: 13px; color: var(--label2); line-height: 1.4; text-align: left; }
+.ep-lbl b { color: var(--label); display: block; }
+
+/* How to get started */
+.how-card {
+  background: var(--card); border-radius: 20px; padding: 20px;
+  margin-bottom: 14px;
+  animation: cardIn 0.5s 0.1s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+.how-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+.how-steps { display: flex; flex-direction: column; gap: 14px; }
+.how-step { display: flex; align-items: center; gap: 14px; }
+.how-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--green); color: #000;
+  font-size: 15px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.how-text { font-size: 15px; font-weight: 500; color: var(--label); line-height: 1.3; }
+.how-text span { color: var(--green); font-weight: 700; }
+
+/* Timer countdown */
+.timer-bar {
+  border: 1.5px solid rgba(34,197,94,0.4); border-radius: 100px;
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-bottom: 14px;
+  animation: cardIn 0.5s 0.2s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+.timer-label {
+  font-size: 11px; font-weight: 700; color: var(--label2);
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.timer-pill {
+  background: var(--green); border-radius: 100px;
+  padding: 4px 12px; display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 800; color: #000;
+}
+
+/* Chevron hint */
+.chevron-hint {
+  text-align: center; padding: 4px 0 10px;
+  animation: bounce 1.5s ease-in-out infinite;
+  color: var(--label2);
+}
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+/* Main CTA — matches our design */
+.result-cta-wrap {
+  padding: 0 16px 14px;
+  animation: cardIn 0.5s 0.3s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+.result-cta {
+  width: 100%; padding: 18px 20px;
+  background: var(--green); border: none; border-radius: 16px;
+  font-family: inherit; font-size: 17px; font-weight: 700; color: #000;
+  cursor: pointer; text-decoration: none;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  position: relative; overflow: hidden; letter-spacing: -0.2px;
+  box-shadow: 0 4px 28px rgba(34,197,94,0.35);
+  animation: ctabreath 2.5s ease-in-out infinite;
+}
+@keyframes ctabreath {
+  0%,100% { box-shadow: 0 4px 28px rgba(34,197,94,0.35); }
+  50%      { box-shadow: 0 4px 44px rgba(34,197,94,0.6); }
+}
+.result-cta::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,0.18) 0%,transparent 55%);
+}
+.result-cta:active { opacity: 0.85; }
+.rc-inner { position:relative; z-index:1; display:flex; align-items:center; gap:10px; }
+.result-cta-sub {
+  text-align:center; font-size:12px; color:var(--label2); margin-top:8px;
+}
+.result-cta-sub .hi { color:var(--green); font-weight:600; }
+
+/* Pro tip card (partial visible at bottom like screenshot) */
+.pro-tip {
+  margin: 0 16px 20px; background: var(--card);
+  border: 1px solid rgba(255,159,10,0.25);
+  border-radius: 16px; padding: 16px;
+  animation: cardIn 0.5s 0.4s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+.pt-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.pt-body  { font-size: 14px; color: var(--label2); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ SCREEN 1 — CHECK ═══════════════════════════ -->
+<div class="screen" id="screen-check">
+
+  <div class="status-bar">
+    <div class="sb-time" id="sb-time-1">9:41</div>
+    <div class="sb-right">
+      <div class="sig-bars">
+        <div class="sig-bar" style="height:4px"></div>
+        <div class="sig-bar" style="height:7px"></div>
+        <div class="sig-bar" style="height:10px"></div>
+        <div class="sig-bar" style="height:13px"></div>
+      </div>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style="margin:0 2px">
+        <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="white"/>
+        <path d="M4.2 7.3A5.3 5.3 0 018 5.8c1.4 0 2.8.55 3.8 1.5" stroke="white" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M1.3 4.4A8.9 8.9 0 018 2c2.4 0 4.6.95 6.7 2.4" stroke="white" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="battery"><div class="battery-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/>
+        <path d="M12 7v10M9.5 9.5C9.5 8.4 10.6 8 12 8s2.5.8 2.5 2c0 2.5-5 2-5 4.5 0 1.4 1.1 2 2.5 2s2.5-.8 2.5-2" stroke="#000" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="logo-text">FREE<span>CASH</span></div>
+  </div>
+
+  <div class="hero-tag"><div class="hero-dot"></div>Available in <span id="state-tag">your area</span></div>
+
+  <div class="hero-heading">See how much your<br><span>phone can earn</span><br>this week</div>
+
+  <div class="hero-sub">Takes 10 seconds. We'll check if your device qualifies and calculate your estimated weekly earnings.</div>
+
+  <!-- Device info preview (shows real data before check) -->
+  <div class="phone-preview">
+    <div class="pp-title">Your Device</div>
+    <div class="pp-rows">
+      <div class="pp-row">
+        <div class="pp-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Device
+        </div>
+        <div class="pp-val" id="device-name">Detecting...</div>
+      </div>
+      <div class="pp-sep"></div>
+      <div class="pp-row">
+        <div class="pp-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Region
+        </div>
+        <div class="pp-val" id="device-region">Detecting...</div>
+      </div>
+      <div class="pp-sep"></div>
+      <div class="pp-row">
+        <div class="pp-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          Location
+        </div>
+        <div class="pp-val" id="device-location">Detecting...</div>
+      </div>
+      <div class="pp-sep"></div>
+      <div class="pp-row">
+        <div class="pp-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Eligible offers
+        </div>
+        <div class="pp-val unknown">— checking</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE CHECK BUTTON -->
+  <button class="check-btn" id="check-btn" onclick="startScan()">
+    <div class="btn-inner">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z" stroke="#000" stroke-width="1.8"/>
+        <path d="M9 12l2 2 4-4" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Check If My Phone Qualifies
+    </div>
+  </button>
+  <div class="check-note">Free check · No personal info required · Results in ~10 seconds</div>
+
+  <div class="proof-strip">
+    <div class="ps-item"><div class="ps-val">2.3<span class="g">M+</span></div><div class="ps-lbl">Users</div></div>
+    <div class="ps-div"></div>
+    <div class="ps-item"><div class="ps-val">$127<span class="g">M</span></div><div class="ps-lbl">Paid out</div></div>
+    <div class="ps-div"></div>
+    <div class="ps-item"><div class="ps-val">4.<span class="g">8</span>★</div><div class="ps-lbl">App Store</div></div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════ SCREEN 2 — SCAN ═══════════════════════════ -->
+<div class="screen" id="screen-scan">
+
+  <div class="scan-logo">
+    <div class="scan-logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/>
+        <path d="M12 7v10M9.5 9.5C9.5 8.4 10.6 8 12 8s2.5.8 2.5 2c0 2.5-5 2-5 4.5 0 1.4 1.1 2 2.5 2s2.5-.8 2.5-2" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="scan-logo-text">FREE<span>CASH</span></div>
+  </div>
+
+  <!-- Phone with scan line + ripples -->
+  <div class="device-wrap">
+    <div class="ripple-ring"></div>
+    <div class="ripple-ring"></div>
+    <div class="ripple-ring"></div>
+
+    <div class="device-phone">
+      <div class="device-screen">
+        <div class="scan-line"></div>
+        <!-- Mini signal bars decorating the phone screen -->
+        <svg width="40" height="30" viewBox="0 0 40 30" fill="none" style="opacity:0.15">
+          <rect x="0" y="22" width="6" height="8" rx="1" fill="white"/>
+          <rect x="8.5" y="16" width="6" height="14" rx="1" fill="white"/>
+          <rect x="17" y="10" width="6" height="20" rx="1" fill="white"/>
+          <rect x="25.5" y="4" width="6" height="26" rx="1" fill="white"/>
+          <rect x="34" y="0" width="6" height="30" rx="1" fill="white"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+  </div>
+
+  <div class="scan-status">Scanning device</div>
+  <div class="scan-step-label" id="scan-label">Initializing check...</div>
+  <div class="scan-step-sub" id="scan-sub">Preparing diagnostic</div>
+
+  <div class="scan-progress-wrap">
+    <div class="scan-prog-header">
+      <div class="scan-prog-lbl">Device analysis</div>
+      <div class="scan-prog-pct" id="scan-pct">0%</div>
+    </div>
+    <div class="scan-prog-track"><div class="scan-prog-bar" id="scan-bar"></div></div>
+  </div>
+
+  <div class="checks-list" id="checks-list">
+    <!-- populated by JS -->
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════ SCREEN 3 — RESULT ═══════════════════════════ -->
+<div class="screen" id="screen-result">
+
+  <div class="result-status-bar">
+    <div class="sb-time" id="sb-time-3">9:41</div>
+    <div class="sb-right">
+      <div class="sig-bars">
+        <div class="sig-bar" style="height:4px"></div>
+        <div class="sig-bar" style="height:7px"></div>
+        <div class="sig-bar" style="height:10px"></div>
+        <div class="sig-bar" style="height:13px"></div>
+      </div>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style="margin:0 2px">
+        <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="white"/>
+        <path d="M4.2 7.3A5.3 5.3 0 018 5.8c1.4 0 2.8.55 3.8 1.5" stroke="white" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M1.3 4.4A8.9 8.9 0 018 2c2.4 0 4.6.95 6.7 2.4" stroke="white" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="battery"><div class="battery-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="result-logo">
+    <div class="rl-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/>
+        <path d="M12 7v10M9.5 9.5C9.5 8.4 10.6 8 12 8s2.5.8 2.5 2c0 2.5-5 2-5 4.5 0 1.4 1.1 2 2.5 2s2.5-.8 2.5-2" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="rl-text">FREE<span class="green">CASH</span></div>
+  </div>
+
+  <div class="result-body">
+
+    <!-- Congrats card -->
+    <div class="congrats-card">
+      <div class="confetti" id="confetti-wrap"></div>
+      <div class="qual-badge">
+        <div class="hero-dot"></div>
+        Your device qualifies
+      </div>
+      <div class="congrats-heading">Congrats!<br>Only 8.67% qualify —<br>and you did.</div>
+      <div class="congrats-sub" style="margin-top:8px">Your <b id="result-device">iPhone</b> is eligible for <b>all premium offers</b>.</div>
+
+      <div class="earn-preview">
+        <div class="ep-val" id="result-earn">$847</div>
+        <div style="width:0.5px;height:36px;background:rgba(34,197,94,0.3)"></div>
+        <div class="ep-lbl"><b>Estimated weekly earnings</b>Based on your device &amp; region</div>
+      </div>
+    </div>
+
+    <!-- How to get started -->
+    <div class="how-card">
+      <div class="how-title">How to Get Started:</div>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-num">1</div>
+          <div class="how-text">Download the FreeCash app</div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">2</div>
+          <div class="how-text">Play your first game → get <span>$5 bonus</span></div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">3</div>
+          <div class="how-text">Play more, earn more — <span>up to $150/day</span></div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">4</div>
+          <div class="how-text">Cash out anytime to PayPal, crypto, or gift cards</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Access timer -->
+    <div class="timer-bar">
+      <div class="timer-label">Access to the app will close in</div>
+      <div class="timer-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#000" stroke-width="2"/>
+          <path d="M12 7v5l3 3" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span id="access-timer">05:00</span>
+      </div>
+    </div>
+
+    <!-- Chevron hint -->
+    <div class="chevron-hint">
+      <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
+        <path d="M2 2l8 8 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+  </div><!-- /result-body -->
+
+  <!-- CTA — our established style -->
+  <div class="result-cta-wrap">
+    <a href="https://fetchtip.com/?a=75&c=1487&s1=" class="result-cta" id="result-cta-btn">
+      <div class="rc-inner">
+        <span id="result-cta-icon"></span>
+        <span id="result-cta-txt">Tap Here To Download Now</span>
+      </div>
+    </a>
+    <div class="result-cta-sub">Free to download · <span class="hi">$5 bonus</span> credited on signup · no card needed</div>
+  </div>
+
+  <!-- Pro tip -->
+  <div class="pro-tip">
+    <div class="pt-title">⚡ PRO TIP: In-Game Upgrades</div>
+    <div class="pt-body">Buy in-game upgrades and get 100% reimbursed — it's the fastest way to unlock higher-paying offers in your first week.</div>
+  </div>
+
+</div>
+
+
+<script>
+// ── CLOCK ──
+function setClock() {
+  const t = new Date();
+  const s = t.getHours().toString().padStart(2,'0') + ':' + t.getMinutes().toString().padStart(2,'0');
+  ['sb-time-1','sb-time-3'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = s; });
+}
+setClock();
+
+// ── OS + DEVICE ──
+const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAndroid = /Android/.test(navigator.userAgent);
+const useIOS    = isIOS||!isAndroid;
+
+// Detect approximate device name
+function getDeviceName() {
+  const ua = navigator.userAgent;
+  if(/iPhone/.test(ua)) return 'iPhone';
+  if(/iPad/.test(ua)) return 'iPad';
+  if(/Pixel/.test(ua)) return 'Google Pixel';
+  if(/Samsung|SM-/.test(ua)) return 'Samsung Galaxy';
+  if(/OnePlus/.test(ua)) return 'OnePlus';
+  if(/Android/.test(ua)) return 'Android Phone';
+  return 'iPhone'; // default for desktop preview
+}
+
+// Store label / CTA
+const storeLabel = useIOS ? 'App Store' : 'Play Store';
+const storeDesc  = useIOS ? 'Free · opens App Store · 30 sec' : 'Free · opens Play Store · 30 sec';
+const ctaTxt     = 'Tap Here To Download Now';
+const ratingNum  = useIOS ? '4.8' : '4.7';
+const ratingCt   = useIOS ? '127K Ratings' : '89K Ratings';
+
+// Apple / Play icon
+const appleIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+  <path d="M17.05 12.54c-.02-1.9 1.55-2.81 1.62-2.86-.88-1.29-2.25-1.47-2.74-1.49-1.17-.12-2.28.69-2.87.69-.59 0-1.5-.67-2.47-.65-1.27.02-2.44.74-3.09 1.88-1.32 2.28-.34 5.67.95 7.52.63.91 1.38 1.94 2.36 1.9.95-.04 1.31-.61 2.46-.61 1.15 0 1.47.61 2.48.59 1.02-.02 1.66-.93 2.28-1.85.73-1.06 1.02-2.09 1.04-2.14-.02-.01-1.99-.76-2.02-3.03z" fill="black"/>
+  <path d="M14.3 7.1c.52-.63.88-1.52.78-2.41-.76.03-1.67.51-2.21 1.14-.48.56-.91 1.46-.8 2.32.85.07 1.71-.43 2.23-1.05z" fill="black"/>
+</svg>`;
+const playIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+  <path d="M5 3.8L15.6 12 5 20.2V3.8z" fill="#34A853"/>
+  <path d="M5 3.8l12 5.3-3.4 2.9L5 3.8z" fill="#FBBC04"/>
+  <path d="M5 20.2l8.6-8.2 3.4 2.9L5 20.2z" fill="#EA4335"/>
+  <path d="M17 12l2.5-1.4c.6-.4.6-1.2 0-1.6L17 7.6l-3.4 4.4 3.4 4z" fill="#4285F4"/>
+</svg>`;
+
+const useIcon = useIOS ? appleIcon : playIcon;
+document.getElementById('result-cta-icon').innerHTML = useIcon;
+document.getElementById('result-cta-txt').textContent = ctaTxt;
+
+// ── STATE ──
+const urlState = new URLSearchParams(window.location.search).get('state');
+const tzMap = {
+  'America/New_York':'New York','America/Chicago':'Texas',
+  'America/Denver':'Colorado','America/Los_Angeles':'California',
+  'America/Phoenix':'Arizona','America/Detroit':'Michigan',
+};
+const state = urlState || tzMap[Intl.DateTimeFormat().resolvedOptions().timeZone] || 'Texas';
+document.getElementById('state-tag').textContent = state;
+
+const citiesMap = {
+  'Texas':['Austin, TX','Houston, TX','Dallas, TX'],
+  'California':['Los Angeles, CA','San Diego, CA','San Jose, CA'],
+  'New York':['Brooklyn, NY','Queens, NY','Buffalo, NY'],
+  'Florida':['Miami, FL','Orlando, FL','Tampa, FL'],
+  'Colorado':['Denver, CO','Boulder, CO','Colorado Springs, CO'],
+};
+
+// ── SCREEN 1 — fill device preview with real data ──
+setTimeout(() => {
+  const deviceName = getDeviceName();
+  document.getElementById('device-name').textContent = deviceName;
+  document.getElementById('device-name').classList.add('green');
+}, 300);
+setTimeout(() => {
+  document.getElementById('device-region').textContent = storeLabel + ' region';
+  document.getElementById('device-region').classList.add('green');
+}, 600);
+setTimeout(() => {
+  document.getElementById('device-location').textContent = state;
+  document.getElementById('device-location').classList.add('green');
+}, 900);
+
+
+// ═══════════════════════════════════════
+// SCAN ANIMATION — 15 seconds
+// ═══════════════════════════════════════
+const scanSteps = [
+  { pct: 8,  label: 'Reading device model...',      sub: 'Identifying hardware profile' },
+  { pct: 18, label: 'Checking OS version...',        sub: 'Verifying compatibility' },
+  { pct: 28, label: 'Detecting region...',           sub: 'Matching offers for ' + state },
+  { pct: 38, label: 'Scanning storage capacity...',  sub: 'Confirming install requirements' },
+  { pct: 50, label: 'Checking network quality...',   sub: 'Wi-Fi / mobile data detected' },
+  { pct: 62, label: 'Analyzing device performance...', sub: 'CPU & memory benchmark' },
+  { pct: 72, label: 'Matching premium offers...',    sub: 'Finding highest-paying tasks' },
+  { pct: 82, label: 'Calculating earnings estimate...', sub: 'Based on your device & location' },
+  { pct: 92, label: 'Finalizing results...',         sub: 'Almost done' },
+  { pct: 100, label: 'Analysis complete ✓',          sub: 'Your device qualifies!' },
+];
+
+const checkLabels = [
+  'Device model — compatible',
+  'OS version — up to date',
+  'Region — offers available',
+  'Storage — sufficient',
+  'Network — detected',
+  'Performance — excellent',
+  'Premium offers — matched',
+];
+
+function showScreen(id) {
+  ['screen-check','screen-scan','screen-result'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = s === id ? 'flex' : 'none';
+  });
+  window.scrollTo(0,0);
+}
+
+function startScan() {
+  showScreen('screen-scan');
+
+  const bar   = document.getElementById('scan-bar');
+  const pct   = document.getElementById('scan-pct');
+  const lbl   = document.getElementById('scan-label');
+  const sub   = document.getElementById('scan-sub');
+  const list  = document.getElementById('checks-list');
+  list.innerHTML = '';
+
+  // Pre-create check items (hidden)
+  checkLabels.forEach(txt => {
+    const div = document.createElement('div');
+    div.className = 'check-item';
+    div.innerHTML = `<div class="check-tick pass">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+        <path d="M1 4l3 3 5-6" stroke="#000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div><span>${txt}</span>`;
+    list.appendChild(div);
+  });
+
+  const items   = list.querySelectorAll('.check-item');
+  const total   = 15000; // 15 seconds total
+  const start   = performance.now();
+  let stepIdx   = 0;
+  let checkIdx  = 0;
+
+  // Step timing: spread 10 steps over 15s
+  const stepTimes = [0, 1200, 2600, 3800, 5000, 6400, 7800, 9400, 11200, 13500];
+  // Check timing: spread 7 checks over first 12s
+  const checkTimes = [1000, 2400, 3600, 5200, 6800, 8600, 10400];
+
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / total, 1);
+
+    // Smooth progress
+    const displayPct = Math.floor(progress * 100);
+    bar.style.width = displayPct + '%';
+    pct.textContent = displayPct + '%';
+
+    // Update scan step labels
+    while(stepIdx < scanSteps.length && elapsed >= stepTimes[stepIdx]) {
+      lbl.textContent = scanSteps[stepIdx].label;
+      sub.textContent = scanSteps[stepIdx].sub;
+      stepIdx++;
+    }
+
+    // Reveal check items
+    while(checkIdx < checkTimes.length && elapsed >= checkTimes[checkIdx]) {
+      if(items[checkIdx]) items[checkIdx].classList.add('done');
+      checkIdx++;
+    }
+
+    if(progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      // Done — show result
+      setTimeout(showResult, 400);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+
+// ═══════════════════════════════════════
+// RESULT SCREEN
+// ═══════════════════════════════════════
+function showResult() {
+  const deviceName = getDeviceName();
+  document.getElementById('result-device').textContent = deviceName;
+
+  // Earnings estimate (vary slightly for realism)
+  const base = 847;
+  const earn = base + Math.floor(Math.random() * 60) - 30;
+  document.getElementById('result-earn').textContent = '$' + earn.toLocaleString();
+
+  showScreen('screen-result');
+  spawnConfetti();
+  startAccessTimer();
+}
+
+// Confetti
+function spawnConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  const colors = ['#22C55E','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
+  for(let i = 0; i < 22; i++) {
+    const d = document.createElement('div');
+    d.className = 'c-dot';
+    d.style.cssText = `
+      left: ${5 + Math.random() * 90}%;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      width: ${4 + Math.random()*5}px;
+      height: ${4 + Math.random()*5}px;
+      animation-delay: ${Math.random() * 0.8}s;
+      animation-duration: ${1.5 + Math.random()}s;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+    `;
+    wrap.appendChild(d);
+  }
+}
+
+// Access timer
+function startAccessTimer() {
+  let secs = 300;
+  const el = document.getElementById('access-timer');
+  const run = () => {
+    if(secs <= 0) secs = 300;
+    secs--;
+    el.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0');
+  };
+  run();
+  setInterval(run, 1000);
+}
+</script>
+</body>
+</html>
