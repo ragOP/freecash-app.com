@@ -148,7 +148,7 @@ $(document).ready(function(){
         e.preventDefault();
         const $btn = $(this);
         const url = $btn.attr("href");
-        trackMetaEvent('Lead'); // Lead: user clicked "START EARNING NOW" (Meta standard event)
+        try { if (typeof fbq !== 'undefined') { fbq('trackCustom', 'LPCTA'); } } catch (e) { console.warn('Meta Pixel:', e); }
         $btn.text("Redirecting...").css("pointer-events", "none");
         setTimeout(function () {
             window.location.href = url;
